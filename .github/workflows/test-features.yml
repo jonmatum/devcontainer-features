@@ -31,18 +31,22 @@ jobs:
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli
 
-      - name: Test only modified features
+      - name: Detect and test modified features
         run: |
+          echo "Fetching main branch to compare..."
+          git fetch origin main
+      
           echo "Detecting modified features..."
-          MODIFIED_FEATURES=$(git diff --name-only origin/main...HEAD | grep '^src/' | cut -d/ -f2 | sort -u)
-
+          # Get list of changed directories under src/
+          MODIFIED_FEATURES=$(git diff --name-only origin/main -- 'src/**' | grep '^src/' | cut -d/ -f2 | sort -u)
+      
           if [ -z "$MODIFIED_FEATURES" ]; then
             echo "No features modified. Skipping tests."
             exit 0
           fi
-
-          echo "Testing modified features: $MODIFIED_FEATURES"
-
+      
+          echo "Modified features detected: $MODIFIED_FEATURES"
+      
           for feature_name in $MODIFIED_FEATURES; do
             feature_dir="src/$feature_name"
             if [ -d "$feature_dir" ]; then
