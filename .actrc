@@ -1,0 +1,11 @@
+# Use a better image than the default
+-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
+
+# Provide a fake GitHub Token when running locally
+-s GITHUB_TOKEN=faketoken
+
+# Always reuse containers (faster local runs)
+--reuse
+
+# Show more detailed logs
+--verbose
