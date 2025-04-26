@@ -1,0 +1,19 @@
+{
+  "packages": {
+    "features/shell": {
+      "release-type": "simple",
+      "changelog-path": "features/shell/CHANGELOG.md",
+      "include-v-in-tag": true
+    },
+    "features/aws": {
+      "release-type": "simple",
+      "changelog-path": "features/aws/CHANGELOG.md",
+      "include-v-in-tag": true
+    },
+    "features/python": {
+      "release-type": "simple",
+      "changelog-path": "features/python/CHANGELOG.md",
+      "include-v-in-tag": true
+    }
+  }
+}
