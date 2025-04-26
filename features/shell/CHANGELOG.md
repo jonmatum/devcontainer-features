@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/jonmatum/devcontainer-features/compare/feature-shell-v1.0.1...feature-shell-v1.0.2) (2025-04-26)
+
+
+### Bug Fixes
+
+* **release:** enable auto-publishing GitHub Releases ([#16](https://github.com/jonmatum/devcontainer-features/issues/16)) ([7852d0d](https://github.com/jonmatum/devcontainer-features/commit/7852d0da0c71a7f68ff74c9ca0c21573381b6517))
+* **release:** enable auto-publishing GitHub Releases ([#17](https://github.com/jonmatum/devcontainer-features/issues/17)) ([f9a6a56](https://github.com/jonmatum/devcontainer-features/commit/f9a6a566cdf5279cb3c5797ecd43fd9359e9bceb))
+
 ## [1.0.1](https://github.com/jonmatum/devcontainer-features/compare/feature-shell-v1.0.0...feature-shell-v1.0.1) (2025-04-26)
 
 
