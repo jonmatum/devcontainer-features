@@ -3,17 +3,38 @@
     "features/shell": {
       "release-type": "simple",
       "changelog-path": "features/shell/CHANGELOG.md",
-      "include-v-in-tag": true
+      "include-v-in-tag": true,
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "features/shell/feature.json",
+          "jsonpath": "$.version"
+        }
+      ]
     },
     "features/aws": {
       "release-type": "simple",
       "changelog-path": "features/aws/CHANGELOG.md",
-      "include-v-in-tag": true
+      "include-v-in-tag": true,
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "features/aws/feature.json",
+          "jsonpath": "$.version"
+        }
+      ]
     },
     "features/python": {
       "release-type": "simple",
       "changelog-path": "features/python/CHANGELOG.md",
-      "include-v-in-tag": true
+      "include-v-in-tag": true,
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "features/python/feature.json",
+          "jsonpath": "$.version"
+        }
+      ]
     }
   }
 }
