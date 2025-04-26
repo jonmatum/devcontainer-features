@@ -1,0 +1,21 @@
+{
+    "default": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "shell": {}
+        }
+    },
+    "minimal-zsh-only": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "shell": {
+                "installZsh": true,
+                "ohMyZsh": false,
+                "powerlevel10k": false,
+                "autosuggestions": false,
+                "syntaxHighlighting": false,
+                "opinionated": false
+            }
+        }
+    }
+}
