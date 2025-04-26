@@ -1,0 +1,44 @@
+name: Validate Features in Clean Containers
+
+on:
+  pull_request:
+    paths:
+      - 'features/**'
+      - '.github/workflows/test-features.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'features/**'
+      - '.github/workflows/test-features.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test-features:
+    name: Test Devcontainer Features
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (for Dev Container CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Test all features
+        run: |
+          echo "Testing features inside clean containers..."
+          for feature_dir in features/*; do
+            if [ -d "$feature_dir" ]; then
+              echo "==============================="
+              echo "Testing feature: $(basename "$feature_dir")"
+              echo "==============================="
+              devcontainer features test -f "$feature_dir" -i mcr.microsoft.com/devcontainers/base:ubuntu
+            fi
+          done
