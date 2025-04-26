@@ -1,6 +1,6 @@
 {
     "id": "shell",
-    "version": "1.0.0",
+    "version": "0.0.0",
     "name": "Shell Environment",
     "description": "Configurable shell with optional Zsh, Oh My Zsh, Powerlevel10k, autosuggestions, and syntax highlighting.",
     "options": {
