@@ -35,5 +35,8 @@
             "description": "Apply opinionated Zsh and Powerlevel10k settings"
         }
     },
-    "entrypoint": "install.sh"
+    "entrypoint": "install.sh",
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils"
+    ]
 }
