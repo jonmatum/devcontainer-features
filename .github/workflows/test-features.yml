@@ -34,7 +34,7 @@ jobs:
       - name: Test all features
         run: |
           echo "Testing features inside clean containers..."
-          for feature_dir in features/*; do
+          for feature_dir in src/*; do
             if [ -d "$feature_dir" ]; then
               echo "==============================="
               echo "Testing feature: $(basename "$feature_dir")"
