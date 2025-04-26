@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/jonmatum/devcontainer-features/compare/feature-shell-v1.0.0...feature-shell-v1.0.1) (2025-04-26)
+
+
+### Bug Fixes
+
+* trigger new release ([#14](https://github.com/jonmatum/devcontainer-features/issues/14)) ([f6b3a44](https://github.com/jonmatum/devcontainer-features/commit/f6b3a4409b622533504c869fdd6d6b03544fe364))
+
 ## 1.0.0 (2025-04-26)
 
 
