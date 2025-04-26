@@ -61,19 +61,21 @@ jobs:
           find features -name feature.json | while read file; do
             echo "Checking $file"
             jq empty "$file"
-
-      - name: Log published features
-        run: |
-          echo "Listing features included in this release:"
-          find features -maxdepth 1 -mindepth 1 -type d | while read feature_dir; do
-            feature_name=$(basename "$feature_dir")
-            feature_version=$(jq -r '.version' "$feature_dir/feature.json")
-            echo "Feature: $feature_name, Version: $feature_version"
           done
 
-      # Placeholder for actual publishing (future)
-      # - name: Publish to Feature Registry
-      #   run: |
-      #     echo "Publishing features to registry..."
-      #     your-publish-command-here
+      - name: Package features into zip files
+        run: |
+          echo "Packaging features..."
+          mkdir -p artifacts
+          find features -maxdepth 1 -mindepth 1 -type d | while read feature_dir; do
+            feature_name=$(basename "$feature_dir")
+            echo "Zipping $feature_name..."
+            zip -r "artifacts/${feature_name}.zip" "$feature_dir"
+          done
 
+      - name: Upload feature artifacts to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
