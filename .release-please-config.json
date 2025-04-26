@@ -3,6 +3,7 @@
     "features/shell": {
       "release-type": "simple",
       "package-name": "feature-shell",
+      "create-release": true,
       "extra-files": [
         {
           "type": "json",
