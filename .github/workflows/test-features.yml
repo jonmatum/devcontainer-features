@@ -5,12 +5,14 @@ on:
     paths:
       - 'src/**'
       - '.github/workflows/test-features.yml'
+      - '.github/scripts/test-features.sh'
   push:
     branches:
       - main
     paths:
       - 'src/**'
       - '.github/workflows/test-features.yml'
+      - '.github/scripts/test-features.sh'
 
 permissions:
   contents: read
@@ -31,28 +33,5 @@ jobs:
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli
 
-      - name: Detect and test modified features
-        run: |
-          echo "Fetching main branch to compare..."
-          git fetch origin main
-      
-          echo "Detecting modified features..."
-          # Get list of changed directories under src/
-          MODIFIED_FEATURES=$(git diff --name-only origin/main -- 'src/**' | grep '^src/' | cut -d/ -f2 | sort -u)
-      
-          if [ -z "$MODIFIED_FEATURES" ]; then
-            echo "No features modified. Skipping tests."
-            exit 0
-          fi
-      
-          echo "Modified features detected: $MODIFIED_FEATURES"
-      
-          for feature_name in $MODIFIED_FEATURES; do
-            feature_dir="src/$feature_name"
-            if [ -d "$feature_dir" ]; then
-              echo "==============================="
-              echo "Testing feature: $feature_name"
-              echo "==============================="
-              devcontainer features test -f "$feature_dir" -i mcr.microsoft.com/devcontainers/base:ubuntu
-            fi
-          done
+      - name: Run feature tests
+        run: bash .github/scripts/test-features.sh
