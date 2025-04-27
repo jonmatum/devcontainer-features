@@ -85,6 +85,12 @@ install_oh_my_zsh() {
     su - "${USERNAME}" -c "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" --unattended"
   fi
 
+  if [ ! -f "${ZSHRC}" ]; then
+    echo "Creating empty .zshrc at ${ZSHRC}"
+    touch "${ZSHRC}"
+    chown "${USERNAME}:${USERNAME}" "${ZSHRC}"
+  fi
+
   grep -qxF 'export ZSH="$HOME/.oh-my-zsh"' "${ZSHRC}" || echo 'export ZSH="$HOME/.oh-my-zsh"' >>"${ZSHRC}"
   grep -qxF 'ZSH_THEME="robbyrussell"' "${ZSHRC}" || echo 'ZSH_THEME="robbyrussell"' >>"${ZSHRC}"
 }
