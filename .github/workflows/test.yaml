@@ -13,12 +13,12 @@ jobs:
     strategy:
       matrix:
         features:
-          - color
-          - hello
+          - shell
         baseImage:
           - debian:latest
           - ubuntu:latest
           - mcr.microsoft.com/devcontainers/base:ubuntu
+          - amazonlinux:2023 
     steps:
       - uses: actions/checkout@v4
 
@@ -34,8 +34,7 @@ jobs:
     strategy:
       matrix:
         features:
-          - color
-          - hello
+          - shell
     steps:
       - uses: actions/checkout@v4
 

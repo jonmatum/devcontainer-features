@@ -1,0 +1,54 @@
+{
+    "amazon": {
+        "image": "amazonlinux:2023",
+        "features": {
+            "shell": {
+                "installZsh": true,
+                "ohMyZsh": false,
+                "powerlevel10k": false,
+                "autosuggestions": false,
+                "syntaxHighlighting": false,
+                "opinionated": false
+            }
+        }
+    },
+    "debian": {
+        "image": "debian:latest",
+        "features": {
+            "shell": {
+                "installZsh": true,
+                "ohMyZsh": false,
+                "powerlevel10k": false,
+                "autosuggestions": false,
+                "syntaxHighlighting": false,
+                "opinionated": false
+            }
+        }
+    },
+    "mcr-ubuntu": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "shell": {
+                "installZsh": true,
+                "ohMyZsh": false,
+                "powerlevel10k": false,
+                "autosuggestions": false,
+                "syntaxHighlighting": false,
+                "opinionated": false
+            }
+        }
+    },
+    "ubuntu": {
+        "image": "ubuntu:latest",
+        "features": {
+            "shell": {
+                "installZsh": true,
+                "ohMyZsh": false,
+                "powerlevel10k": false,
+                "autosuggestions": false,
+                "syntaxHighlighting": false,
+                "opinionated": false
+            }
+        }
+    }
+}
