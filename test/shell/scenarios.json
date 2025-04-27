@@ -4,10 +4,10 @@
         "features": {
             "shell": {
                 "installZsh": true,
-                "ohMyZsh": false,
-                "powerlevel10k": false,
-                "autosuggestions": false,
-                "syntaxHighlighting": false,
+                "ohMyZsh": true,
+                "powerlevel10k": true,
+                "autosuggestions": true,
+                "syntaxHighlighting": true,
                 "opinionated": false
             }
         }
