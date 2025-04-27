@@ -1,7 +1,8 @@
 {
+  "release-type": "simple",
   "packages": {
     "src/shell": {
-      "release-type": "simple",
+      "component": "shell",
       "package-name": "devcontainer-feature-shell",
       "extra-files": [
         {
