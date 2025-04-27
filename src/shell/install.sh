@@ -1,13 +1,16 @@
 #!/bin/bash
 set -e
 
+# Import devcontainer feature utils if available
+source /usr/local/share/feature-utils.sh || true
+
 USERNAME="${_REMOTE_USER:-vscode}"
-USER_HOME="/home/$USERNAME"
-ZSHRC="$USER_HOME/.zshrc"
-OMZ_DIR="$USER_HOME/.oh-my-zsh"
+USER_HOME="/home/${USERNAME}"
+ZSHRC="${USER_HOME}/.zshrc"
+OMZ_DIR="${USER_HOME}/.oh-my-zsh"
 ZSH_CUSTOM="${OMZ_DIR}/custom"
 
-# Options
+# Feature options with defaults
 : "${INSTALLZSH:=true}"
 : "${OHMYZSH:=true}"
 : "${POWERLEVEL10K:=true}"
@@ -16,68 +19,119 @@ ZSH_CUSTOM="${OMZ_DIR}/custom"
 : "${AUTOSUGGESTHIGHLIGHT:=fg=8}"
 : "${OPINIONATED:=false}"
 
-apt-get update
+# Detect system package manager
+detect_package_manager() {
+  if command -v apt-get &>/dev/null; then
+    echo "apt"
+  elif command -v dnf &>/dev/null; then
+    echo "dnf"
+  elif command -v yum &>/dev/null; then
+    echo "yum"
+  else
+    echo "unsupported"
+  fi
+}
 
-# Install Zsh if required
-if [[ "$INSTALLZSH" == "true" ]]; then
-  if ! command -v zsh &>/dev/null; then
-    echo "Installing Zsh..."
+install_zsh() {
+  local package_manager
+  package_manager=$(detect_package_manager)
+
+  echo "Installing Zsh using ${package_manager}..."
+
+  case "${package_manager}" in
+  apt)
+    apt-get update
     apt-get install -y zsh
-  fi
-  chsh -s "$(which zsh)" "$USERNAME"
-fi
+    ;;
+  dnf)
+    dnf install -y zsh util-linux-user
+    ;;
+  yum)
+    yum install -y zsh util-linux-user
+    ;;
+  *)
+    echo "Unsupported package manager. Cannot install Zsh automatically."
+    exit 1
+    ;;
+  esac
 
-# Oh My Zsh setup
-if [[ "$OHMYZSH" == "true" ]]; then
-  if [ ! -d "$OMZ_DIR" ]; then
+  echo "Changing default shell to Zsh for user ${USERNAME}"
+  chsh -s "$(command -v zsh)" "${USERNAME}"
+}
+
+install_oh_my_zsh() {
+  if [ ! -d "${OMZ_DIR}" ]; then
     echo "Installing Oh My Zsh..."
-    su - "$USERNAME" -c "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" --unattended"
+    su - "${USERNAME}" -c "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" --unattended"
   fi
 
-  grep -qxF 'export ZSH="$HOME/.oh-my-zsh"' "$ZSHRC" || echo 'export ZSH="$HOME/.oh-my-zsh"' >>"$ZSHRC"
-  grep -qxF 'ZSH_THEME="robbyrussell"' "$ZSHRC" || echo 'ZSH_THEME="robbyrussell"' >>"$ZSHRC"
+  grep -qxF 'export ZSH="$HOME/.oh-my-zsh"' "${ZSHRC}" || echo 'export ZSH="$HOME/.oh-my-zsh"' >>"${ZSHRC}"
+  grep -qxF 'ZSH_THEME="robbyrussell"' "${ZSHRC}" || echo 'ZSH_THEME="robbyrussell"' >>"${ZSHRC}"
+}
+
+install_powerlevel10k() {
+  local THEME_DIR="${ZSH_CUSTOM}/themes/powerlevel10k"
+  if [ ! -d "${THEME_DIR}" ]; then
+    echo "Installing Powerlevel10k theme..."
+    su - "${USERNAME}" -c "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git '${THEME_DIR}'"
+  fi
+  sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${ZSHRC}" || true
+
+  if [[ "${OPINIONATED}" == "true" ]]; then
+    echo "Applying opinionated Powerlevel10k configuration..."
+    cp "$(dirname "$0")/assets/p10k.zsh" "${USER_HOME}/.p10k.zsh"
+    chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.p10k.zsh"
+    grep -qxF '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' "${ZSHRC}" || echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >>"${ZSHRC}"
+  fi
+}
+
+install_autosuggestions() {
+  local PLUGIN_DIR="${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
+  if [ ! -d "${PLUGIN_DIR}" ]; then
+    echo "Installing zsh-autosuggestions plugin..."
+    su - "${USERNAME}" -c "git clone https://github.com/zsh-users/zsh-autosuggestions '${PLUGIN_DIR}'"
+  fi
+  grep -qxF "source ${PLUGIN_DIR}/zsh-autosuggestions.zsh" "${ZSHRC}" || echo "source ${PLUGIN_DIR}/zsh-autosuggestions.zsh" >>"${ZSHRC}"
+  grep -qxF "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='${AUTOSUGGESTHIGHLIGHT}'" "${ZSHRC}" || echo "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='${AUTOSUGGESTHIGHLIGHT}'" >>"${ZSHRC}"
+}
+
+install_syntax_highlighting() {
+  local PLUGIN_DIR="${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
+  if [ ! -d "${PLUGIN_DIR}" ]; then
+    echo "Installing zsh-syntax-highlighting plugin..."
+    su - "${USERNAME}" -c "git clone https://github.com/zsh-users/zsh-syntax-highlighting.git '${PLUGIN_DIR}'"
+  fi
+  grep -qxF "source ${PLUGIN_DIR}/zsh-syntax-highlighting.zsh" "${ZSHRC}" || echo "source ${PLUGIN_DIR}/zsh-syntax-highlighting.zsh" >>"${ZSHRC}"
+}
+
+finalize_permissions() {
+  echo "Adjusting ownership for user ${USERNAME}..."
+  chown -R "${USERNAME}:${USERNAME}" "${USER_HOME}"
+}
+
+# --- Main ---
+echo "Starting shell environment setup..."
+
+if [[ "${INSTALLZSH}" == "true" ]]; then
+  install_zsh
 fi
 
-# Powerlevel10k theme
-if [[ "$POWERLEVEL10K" == "true" ]]; then
-  THEME_DIR="${ZSH_CUSTOM}/themes/powerlevel10k"
-  if [ ! -d "$THEME_DIR" ]; then
-    echo "Installing Powerlevel10k..."
-    su - "$USERNAME" -c "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $THEME_DIR"
-  fi
-  sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "$ZSHRC" || true
-
-  # 💡 Apply preconfigured .p10k.zsh only in opinionated mode
-  if [[ "$OPINIONATED" == "true" ]]; then
-    echo "Applying default Powerlevel10k configuration..."
-    cp "$(dirname "$0")/assets/p10k.zsh" "$USER_HOME/.p10k.zsh"
-    chown "$USERNAME:$USERNAME" "$USER_HOME/.p10k.zsh"
-    grep -qxF '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' "$ZSHRC" || echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >>"$ZSHRC"
-  fi
+if [[ "${OHMYZSH}" == "true" ]]; then
+  install_oh_my_zsh
 fi
 
-# Autosuggestions plugin
-if [[ "$AUTOSUGGESTIONS" == "true" ]]; then
-  PLUGIN_DIR="${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
-  if [ ! -d "$PLUGIN_DIR" ]; then
-    echo "Installing zsh-autosuggestions..."
-    su - "$USERNAME" -c "git clone https://github.com/zsh-users/zsh-autosuggestions $PLUGIN_DIR"
-  fi
-  grep -qxF "source ${PLUGIN_DIR}/zsh-autosuggestions.zsh" "$ZSHRC" || echo "source ${PLUGIN_DIR}/zsh-autosuggestions.zsh" >>"$ZSHRC"
-  grep -qxF "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='$AUTOSUGGESTHIGHLIGHT'" "$ZSHRC" || echo "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='$AUTOSUGGESTHIGHLIGHT'" >>"$ZSHRC"
+if [[ "${POWERLEVEL10K}" == "true" ]]; then
+  install_powerlevel10k
 fi
 
-# Syntax Highlighting plugin
-if [[ "$SYNTAXHIGHLIGHTING" == "true" ]]; then
-  PLUGIN_DIR="${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
-  if [ ! -d "$PLUGIN_DIR" ]; then
-    echo "Installing zsh-syntax-highlighting..."
-    su - "$USERNAME" -c "git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $PLUGIN_DIR"
-  fi
-  grep -qxF "source ${PLUGIN_DIR}/zsh-syntax-highlighting.zsh" "$ZSHRC" || echo "source ${PLUGIN_DIR}/zsh-syntax-highlighting.zsh" >>"$ZSHRC"
+if [[ "${AUTOSUGGESTIONS}" == "true" ]]; then
+  install_autosuggestions
 fi
 
-# Ownership
-chown -R "$USERNAME:$USERNAME" "$USER_HOME"
-echo "✅ Shell configuration complete for $USERNAME"
-[[ "$OPINIONATED" == "true" ]] && echo "(💡 opinionated Powerlevel10k config applied)"
+if [[ "${SYNTAXHIGHLIGHTING}" == "true" ]]; then
+  install_syntax_highlighting
+fi
+
+finalize_permissions
+
+echo "Shell environment setup completed successfully for user ${USERNAME}."

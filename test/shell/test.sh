@@ -4,10 +4,13 @@ set -e
 # Import test library
 source dev-container-features-test-lib
 
-# Example: you could check that Zsh is still installed, but Oh-My-Zsh isn't if disabled
+# Basic tests
+
+# Check that zsh is installed
 check "zsh installed" zsh --version
 
-# If oh-my-zsh was turned off in the scenario, you could add:
-check "oh-my-zsh NOT installed" bash -c "[[ ! -d \"\$HOME/.oh-my-zsh\" ]]"
+# Check that oh-my-zsh is NOT installed
+check "oh-my-zsh NOT installed" bash -c "[[ ! -d $HOME/.oh-my-zsh ]]"
 
+# Report results
 reportResults
