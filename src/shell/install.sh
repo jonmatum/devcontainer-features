@@ -56,7 +56,7 @@ install_packages() {
     apt-get update -y && apt-get install -y ${packages}
     ;;
   dnf)
-    dnf install -y ${packages}
+    dnf install -y --allowerasing ${packages}
     ;;
   yum)
     yum install -y ${packages}
@@ -72,9 +72,28 @@ install_packages() {
 }
 
 install_zsh() {
-  install_packages zsh util-linux-user || true
-  echo "Changing default shell to Zsh for user ${USERNAME}..."
-  chsh -s "$(command -v zsh)" "${USERNAME}" || true
+  local package_manager
+  package_manager=$(detect_package_manager)
+
+  echo "Installing Zsh using ${package_manager}..."
+  case "${package_manager}" in
+  apt)
+    apt-get update && apt-get install -y zsh
+    ;;
+  dnf)
+    dnf install -y --allowerasing zsh util-linux-user
+    ;;
+  yum)
+    yum install -y zsh util-linux-user
+    ;;
+  *)
+    echo "Unsupported package manager. Cannot install Zsh automatically."
+    exit 1
+    ;;
+  esac
+
+  echo "Changing default shell to Zsh for user ${USERNAME}"
+  chsh -s "$(command -v zsh)" "${USERNAME}"
 }
 
 install_oh_my_zsh() {
