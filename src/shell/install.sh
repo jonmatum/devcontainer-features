@@ -19,7 +19,6 @@ ZSH_CUSTOM="${OMZ_DIR}/custom"
 : "${AUTOSUGGESTHIGHLIGHT:=fg=8}"
 : "${OPINIONATED:=false}"
 
-# Detect system package manager
 detect_package_manager() {
   if command -v apt-get &>/dev/null; then
     echo "apt"
@@ -32,16 +31,37 @@ detect_package_manager() {
   fi
 }
 
+install_git_if_needed() {
+  if ! command -v git &>/dev/null; then
+    echo "Git not found. Installing git..."
+    local package_manager
+    package_manager=$(detect_package_manager)
+    case "${package_manager}" in
+    apt)
+      apt-get update && apt-get install -y git
+      ;;
+    dnf)
+      dnf install -y git
+      ;;
+    yum)
+      yum install -y git
+      ;;
+    *)
+      echo "Unsupported package manager. Cannot install git automatically."
+      exit 1
+      ;;
+    esac
+  fi
+}
+
 install_zsh() {
   local package_manager
   package_manager=$(detect_package_manager)
 
   echo "Installing Zsh using ${package_manager}..."
-
   case "${package_manager}" in
   apt)
-    apt-get update
-    apt-get install -y zsh
+    apt-get update && apt-get install -y zsh
     ;;
   dnf)
     dnf install -y zsh util-linux-user
@@ -111,6 +131,8 @@ finalize_permissions() {
 
 # --- Main ---
 echo "Starting shell environment setup..."
+
+install_git_if_needed
 
 if [[ "${INSTALLZSH}" == "true" ]]; then
   install_zsh
