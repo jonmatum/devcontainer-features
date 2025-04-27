@@ -48,15 +48,9 @@ install_git_if_needed() {
     local package_manager
     package_manager=$(detect_package_manager)
     case "${package_manager}" in
-    apt)
-      apt-get update && apt-get install -y git
-      ;;
-    dnf)
-      dnf install -y git
-      ;;
-    yum)
-      yum install -y git
-      ;;
+    apt) apt-get update && apt-get install -y git ;;
+    dnf) dnf install -y git ;;
+    yum) yum install -y git ;;
     *)
       echo "Unsupported package manager. Cannot install git automatically."
       exit 1
@@ -71,15 +65,9 @@ install_zsh() {
 
   echo "Installing Zsh using ${package_manager}..."
   case "${package_manager}" in
-  apt)
-    apt-get update && apt-get install -y zsh
-    ;;
-  dnf)
-    dnf install -y zsh util-linux-user
-    ;;
-  yum)
-    yum install -y zsh util-linux-user
-    ;;
+  apt) apt-get update && apt-get install -y zsh ;;
+  dnf) dnf install -y zsh util-linux-user ;;
+  yum) yum install -y zsh util-linux-user ;;
   *)
     echo "Unsupported package manager. Cannot install Zsh automatically."
     exit 1
@@ -91,13 +79,12 @@ install_zsh() {
 }
 
 install_oh_my_zsh() {
+  echo "Installing Oh My Zsh..."
   if [ ! -d "${OMZ_DIR}" ]; then
-    echo "Installing Oh My Zsh..."
     su - "${USERNAME}" -c "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" --unattended"
   fi
 
   if [ ! -f "${ZSHRC}" ]; then
-    echo "Creating empty .zshrc at ${ZSHRC}"
     touch "${ZSHRC}"
     chown "${USERNAME}:${USERNAME}" "${ZSHRC}"
   fi
@@ -108,8 +95,8 @@ install_oh_my_zsh() {
 
 install_powerlevel10k() {
   local THEME_DIR="${ZSH_CUSTOM}/themes/powerlevel10k"
+  echo "Installing Powerlevel10k theme..."
   if [ ! -d "${THEME_DIR}" ]; then
-    echo "Installing Powerlevel10k theme..."
     su - "${USERNAME}" -c "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git '${THEME_DIR}'"
   fi
   sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "${ZSHRC}" || true
@@ -124,8 +111,8 @@ install_powerlevel10k() {
 
 install_autosuggestions() {
   local PLUGIN_DIR="${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
+  echo "Installing zsh-autosuggestions plugin..."
   if [ ! -d "${PLUGIN_DIR}" ]; then
-    echo "Installing zsh-autosuggestions plugin..."
     su - "${USERNAME}" -c "git clone https://github.com/zsh-users/zsh-autosuggestions '${PLUGIN_DIR}'"
   fi
   grep -qxF "source ${PLUGIN_DIR}/zsh-autosuggestions.zsh" "${ZSHRC}" || echo "source ${PLUGIN_DIR}/zsh-autosuggestions.zsh" >>"${ZSHRC}"
@@ -134,8 +121,8 @@ install_autosuggestions() {
 
 install_syntax_highlighting() {
   local PLUGIN_DIR="${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
+  echo "Installing zsh-syntax-highlighting plugin..."
   if [ ! -d "${PLUGIN_DIR}" ]; then
-    echo "Installing zsh-syntax-highlighting plugin..."
     su - "${USERNAME}" -c "git clone https://github.com/zsh-users/zsh-syntax-highlighting.git '${PLUGIN_DIR}'"
   fi
   grep -qxF "source ${PLUGIN_DIR}/zsh-syntax-highlighting.zsh" "${ZSHRC}" || echo "source ${PLUGIN_DIR}/zsh-syntax-highlighting.zsh" >>"${ZSHRC}"
@@ -157,18 +144,20 @@ fi
 
 if [[ "${OHMYZSH}" == "true" ]]; then
   install_oh_my_zsh
-fi
 
-if [[ "${POWERLEVEL10K}" == "true" ]]; then
-  install_powerlevel10k
-fi
+  if [[ "${POWERLEVEL10K}" == "true" ]]; then
+    install_powerlevel10k
+  fi
 
-if [[ "${AUTOSUGGESTIONS}" == "true" ]]; then
-  install_autosuggestions
-fi
+  if [[ "${AUTOSUGGESTIONS}" == "true" ]]; then
+    install_autosuggestions
+  fi
 
-if [[ "${SYNTAXHIGHLIGHTING}" == "true" ]]; then
-  install_syntax_highlighting
+  if [[ "${SYNTAXHIGHLIGHTING}" == "true" ]]; then
+    install_syntax_highlighting
+  fi
+else
+  echo "Skipping Oh My Zsh and related plugins/themes because OHMYZSH=false"
 fi
 
 finalize_permissions
