@@ -5,7 +5,13 @@ set -e
 source /usr/local/share/feature-utils.sh || true
 
 USERNAME="${_REMOTE_USER:-vscode}"
-USER_HOME="/home/${USERNAME}"
+
+if [ "${USERNAME}" = "root" ]; then
+  USER_HOME="/root"
+else
+  USER_HOME="/home/${USERNAME}"
+fi
+
 ZSHRC="${USER_HOME}/.zshrc"
 OMZ_DIR="${USER_HOME}/.oh-my-zsh"
 ZSH_CUSTOM="${OMZ_DIR}/custom"
