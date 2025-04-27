@@ -1,13 +1,12 @@
 {
   "packages": {
-    "features/shell": {
+    "src/shell": {
       "release-type": "simple",
-      "package-name": "feature-shell",
-      "create-release": true,
+      "package-name": "devcontainer-feature-shell",
       "extra-files": [
         {
           "type": "json",
-          "path": "features/shell/feature.json",
+          "path": "src/shell/devcontainer-feature.json",
           "jsonpath": "$.version"
         }
       ]

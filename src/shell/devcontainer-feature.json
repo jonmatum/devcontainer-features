@@ -1,8 +1,8 @@
 {
     "id": "shell",
     "version": "0.0.0",
-    "name": "Shell Environment",
-    "description": "Configurable shell setup with optional Zsh, Oh My Zsh, Powerlevel10k, autosuggestions, and syntax highlighting.",
+    "name": "Shell Setup",
+    "description": "Setup Zsh with optional Oh My Zsh, Powerlevel10k theme, and useful plugins for a powerful terminal experience.",
     "options": {
         "installZsh": {
             "type": "boolean",
