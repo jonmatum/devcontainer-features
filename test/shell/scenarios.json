@@ -1,5 +1,5 @@
 {
-    "amazonlinux": {
+    "amazon": {
         "image": "amazonlinux:2023",
         "features": {
             "shell": {
@@ -25,7 +25,7 @@
             }
         }
     },
-    "mcrUbuntu": {
+    "mcr-ubuntu": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
         "features": {
             "shell": {
