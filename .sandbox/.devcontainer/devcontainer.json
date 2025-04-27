@@ -1,0 +1,9 @@
+{
+  "name": "Feature Test Sandbox",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "./features/shell": {
+    "opinionated": true
+    }
+  }
+}
