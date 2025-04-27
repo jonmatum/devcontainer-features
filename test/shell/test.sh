@@ -8,6 +8,6 @@ source dev-container-features-test-lib
 check "zsh installed" zsh --version
 
 # If oh-my-zsh was turned off in the scenario, you could add:
-check "oh-my-zsh NOT installed" bash -c "[[ ! -d $HOME/.oh-my-zsh ]]"
+check "oh-my-zsh NOT installed" bash -c "[[ ! -d \"\$HOME/.oh-my-zsh\" ]]"
 
 reportResults

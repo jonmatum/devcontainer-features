@@ -1,11 +1,5 @@
 {
-    "default": {
-        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-        "features": {
-            "shell": {}
-        }
-    },
-    "minimal-zsh-only": {
+    "shell": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
         "features": {
             "shell": {
