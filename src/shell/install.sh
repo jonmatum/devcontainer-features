@@ -1,8 +1,13 @@
 #!/bin/bash
 set -e
 
-# Import devcontainer feature utils if available
-source /usr/local/share/feature-utils.sh || true
+if [ -f "/usr/local/share/feature-utils.sh" ]; then
+  . /usr/local/share/feature-utils.sh
+else
+  echo "Warning: feature-utils.sh not found. Continuing without it."
+fi
+
+echo "> Starting shell environment setup..."
 
 USERNAME="${_REMOTE_USER:-vscode}"
 
