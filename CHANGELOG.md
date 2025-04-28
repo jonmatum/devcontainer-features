@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/jonmatum/devcontainer-features/compare/v1.1.2...v1.1.3) (2025-04-28)
+
+
+### Bug Fixes
+
+* **shell:** update feature option parameters to use uppercase environment variables ([2f99951](https://github.com/jonmatum/devcontainer-features/commit/2f99951f05b8e5a8674447ca4d738e38af2ba752))
+
 ## [1.1.2](https://github.com/jonmatum/devcontainer-features/compare/v1.1.1...v1.1.2) (2025-04-28)
 
 
