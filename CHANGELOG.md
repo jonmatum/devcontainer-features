@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/jonmatum/devcontainer-features/compare/v1.0.0...v1.0.1) (2025-04-28)
+
+
+### Bug Fixes
+
+* **tests:** remove invalid color_and_hello scenario to match current feature set ([#35](https://github.com/jonmatum/devcontainer-features/issues/35)) ([4e23b91](https://github.com/jonmatum/devcontainer-features/commit/4e23b91f756a6c2686d4c4d2e1f3220ae66a7540))
+
 ## 1.0.0 (2025-04-28)
 
 
