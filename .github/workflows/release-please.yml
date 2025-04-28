@@ -1,4 +1,4 @@
-name: Release Please: Manage Versions and Changelog
+name: "Release Please: Manage Versions and Changelog"
 
 on:
   push:
@@ -10,11 +10,11 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-please:
-    name: Release Please: Manage Versions and Changelog
+  release:
+    name: "Release and Changelog"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Run Release Please
