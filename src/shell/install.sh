@@ -27,16 +27,16 @@ OMZ_DIR="${USER_HOME}/.oh-my-zsh"
 ZSH_CUSTOM="${OMZ_DIR}/custom"
 
 # Feature options
-: "${installZsh:=true}"
-: "${ohMyZsh:=true}"
-: "${powerlevel10k:=true}"
-: "${autosuggestions:=true}"
-: "${syntaxHighlighting:=true}"
-: "${opinionated:=false}"
-: "${autosuggestHighlight:=fg=8}"
-: "${zshrcUrl:=}"
-: "${p10kUrl:=}"
-: "${postInstallScriptUrl:=}"
+: "${INSTALLZSH:=true}"
+: "${OHMYZSH:=true}"
+: "${POWERLEVEL10K:=true}"
+: "${AUTOSUGGESTIONS:=true}"
+: "${SYNTAXHIGHLIGHTING:=true}"
+: "${OPINIONATED:=false}"
+: "${AUTOSUGGESTHIGHLIGHT:=fg=8}"
+: "${ZSHRCURL:=}"
+: "${P10KURL:=}"
+: "${POSTINSTALLSCRIPTURL:=}"
 
 detect_package_manager() {
   if command -v apt-get &>/dev/null; then
@@ -150,7 +150,7 @@ install_autosuggestions() {
     su - "${USERNAME}" -c "git clone https://github.com/zsh-users/zsh-autosuggestions '${plugin_dir}'"
   fi
   grep -qxF "source ${plugin_dir}/zsh-autosuggestions.zsh" "${ZSHRC}" || echo "source ${plugin_dir}/zsh-autosuggestions.zsh" >>"${ZSHRC}"
-  grep -qxF "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='${autosuggestHighlight}'" "${ZSHRC}" || echo "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='${autosuggestHighlight}'" >>"${ZSHRC}"
+  grep -qxF "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='${AUTOSUGGESTHIGHLIGHT}'" "${ZSHRC}" || echo "ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='${AUTOSUGGESTHIGHLIGHT}'" >>"${ZSHRC}"
 }
 
 install_syntax_highlighting() {
@@ -171,18 +171,18 @@ apply_opinionated_files() {
   echo "> Applying opinionated config files..."
 
   # Download custom .zshrc if provided
-  if [ -n "$zshrcUrl" ]; then
-    echo "Downloading custom .zshrc from $zshrcUrl"
-    curl -fsSL "$zshrcUrl" -o "${USER_HOME}/.zshrc"
+  if [ -n "$ZSHRCURL" ]; then
+    echo "Downloading custom .zshrc from $ZSHRCURL"
+    curl -fsSL "$ZSHRCURL" -o "${USER_HOME}/.zshrc"
     chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.zshrc"
   else
     echo "No custom .zshrc URL provided. Skipping."
   fi
 
   # Download custom .p10k.zsh if provided
-  if [ -n "$p10kUrl" ]; then
-    echo "Downloading custom .p10k.zsh from $p10kUrl"
-    curl -fsSL "$p10kUrl" -o "${USER_HOME}/.p10k.zsh"
+  if [ -n "$P10KURL" ]; then
+    echo "Downloading custom .p10k.zsh from $P10KURL"
+    curl -fsSL "$P10KURL" -o "${USER_HOME}/.p10k.zsh"
     chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.p10k.zsh"
   else
     echo "No custom .p10k.zsh URL provided. Skipping."
@@ -193,9 +193,9 @@ apply_opinionated_files() {
 }
 
 run_post_install_script() {
-  if [ -n "$postInstallScriptUrl" ]; then
-    echo "> Running custom post-install script from $postInstallScriptUrl"
-    curl -fsSL "$postInstallScriptUrl" | bash || echo "Warning: Failed to execute post-install script."
+  if [ -n "$POSTINSTALLSCRIPTURL" ]; then
+    echo "> Running custom post-install script from $POSTINSTALLSCRIPTURL"
+    curl -fsSL "$POSTINSTALLSCRIPTURL" | bash || echo "Warning: Failed to execute post-install script."
   else
     echo "> No post-install script URL provided. Skipping."
   fi
@@ -205,27 +205,27 @@ run_post_install_script() {
 
 ensure_common_dependencies
 
-if [[ "${installZsh}" == "true" ]]; then
+if [[ "${INSTALLZSH}" == "true" ]]; then
   install_zsh
 fi
 
-if [[ "${installZsh}" == "true" && "${ohMyZsh}" == "true" ]]; then
+if [[ "${INSTALLZSH}" == "true" && "${OHMYZSH}" == "true" ]]; then
   install_oh_my_zsh
 fi
 
-if [[ "${powerlevel10k}" == "true" && "${ohMyZsh}" == "true" ]]; then
+if [[ "${POWERLEVEL10K}" == "true" && "${OHMYZSH}" == "true" ]]; then
   install_powerlevel10k
 fi
 
-if [[ "${autosuggestions}" == "true" && "${ohMyZsh}" == "true" ]]; then
+if [[ "${AUTOSUGGESTIONS}" == "true" && "${OHMYZSH}" == "true" ]]; then
   install_autosuggestions
 fi
 
-if [[ "${syntaxHighlighting}" == "true" && "${ohMyZsh}" == "true" ]]; then
+if [[ "${SYNTAXHIGHLIGHTING}" == "true" && "${OHMYZSH}" == "true" ]]; then
   install_syntax_highlighting
 fi
 
-if [[ "${opinionated}" == "true" ]]; then
+if [[ "${OPINIONATED}" == "true" ]]; then
   apply_opinionated_files
 fi
 
