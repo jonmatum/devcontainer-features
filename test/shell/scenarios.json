@@ -4,11 +4,12 @@
         "features": {
             "shell": {
                 "installZsh": true,
-                "ohMyZsh": false,
-                "powerlevel10k": false,
-                "autosuggestions": false,
-                "syntaxHighlighting": false,
-                "opinionated": false
+                "ohMyZsh": true,
+                "powerlevel10k": true,
+                "autosuggestions": true,
+                "syntaxHighlighting": true,
+                "opinionated": true,
+                "p10kUrl": "https://gist.githubusercontent.com/jonmatum/e567e6d2ffb82d0942e4176bfed1b62b/raw/9c5d5ba72a647d1e7cabb7f05931bdfb8098cc3d/.p10k.zsh"
             }
         }
     },
@@ -17,11 +18,12 @@
         "features": {
             "shell": {
                 "installZsh": true,
-                "ohMyZsh": false,
-                "powerlevel10k": false,
-                "autosuggestions": false,
-                "syntaxHighlighting": false,
-                "opinionated": false
+                "ohMyZsh": true,
+                "powerlevel10k": true,
+                "autosuggestions": true,
+                "syntaxHighlighting": true,
+                "opinionated": true,
+                "p10kUrl": "https://gist.githubusercontent.com/jonmatum/e567e6d2ffb82d0942e4176bfed1b62b/raw/9c5d5ba72a647d1e7cabb7f05931bdfb8098cc3d/.p10k.zsh"
             }
         }
     },
@@ -30,11 +32,12 @@
         "features": {
             "shell": {
                 "installZsh": true,
-                "ohMyZsh": false,
-                "powerlevel10k": false,
-                "autosuggestions": false,
-                "syntaxHighlighting": false,
-                "opinionated": false
+                "ohMyZsh": true,
+                "powerlevel10k": true,
+                "autosuggestions": true,
+                "syntaxHighlighting": true,
+                "opinionated": true,
+                "p10kUrl": "https://gist.githubusercontent.com/jonmatum/e567e6d2ffb82d0942e4176bfed1b62b/raw/9c5d5ba72a647d1e7cabb7f05931bdfb8098cc3d/.p10k.zsh"
             }
         }
     },
@@ -43,11 +46,12 @@
         "features": {
             "shell": {
                 "installZsh": true,
-                "ohMyZsh": false,
-                "powerlevel10k": false,
-                "autosuggestions": false,
-                "syntaxHighlighting": false,
-                "opinionated": false
+                "ohMyZsh": true,
+                "powerlevel10k": true,
+                "autosuggestions": true,
+                "syntaxHighlighting": true,
+                "opinionated": true,
+                "p10kUrl": "https://gist.githubusercontent.com/jonmatum/e567e6d2ffb82d0942e4176bfed1b62b/raw/9c5d5ba72a647d1e7cabb7f05931bdfb8098cc3d/.p10k.zsh"
             }
         }
     }
