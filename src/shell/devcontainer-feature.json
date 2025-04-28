@@ -49,9 +49,5 @@
             "default": "",
             "description": "Optional URL to a bash script to execute at the end of the setup."
         }
-    },
-    "entrypoint": "install.sh",
-    "installsAfter": [
-        "ghcr.io/devcontainers/features/common-utils"
-    ]
+    }
 }
