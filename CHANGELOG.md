@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/jonmatum/devcontainer-features/compare/v1.0.1...v1.1.0) (2025-04-28)
+
+
+### Features
+
+* **shell:** add support for optional post-install script via URL ([#37](https://github.com/jonmatum/devcontainer-features/issues/37)) ([f029b13](https://github.com/jonmatum/devcontainer-features/commit/f029b13735b9578b344b529a3ae29052438ae688))
+
 ## [1.0.1](https://github.com/jonmatum/devcontainer-features/compare/v1.0.0...v1.0.1) (2025-04-28)
 
 
