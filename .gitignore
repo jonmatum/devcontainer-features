@@ -1,0 +1,29 @@
+# Node dependencies (optional for tools like release-please)
+node_modules/
+
+# Dev Container feature artifacts
+artifacts/
+*.zip
+
+# Build outputs (if you have build steps)
+dist/
+build/
+
+# VS Code settings
+.vscode/
+
+# MacOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+.sandbox/
