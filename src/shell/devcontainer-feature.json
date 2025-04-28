@@ -1,7 +1,7 @@
 {
     "id": "shell",
-    "version": "0.0.0",
-    "name": "Shell Environment",
+    "version": "1.0.0",
+    "name": "Shell Setup",
     "description": "Configurable shell setup with optional Zsh, Oh My Zsh, Powerlevel10k, autosuggestions, and syntax highlighting.",
     "options": {
         "installZsh": {
@@ -32,7 +32,22 @@
         "opinionated": {
             "type": "boolean",
             "default": false,
-            "description": "Apply an opinionated Powerlevel10k configuration for a highly customized prompt."
+            "description": "Apply custom opinionated configuration."
+        },
+        "zshrcUrl": {
+            "type": "string",
+            "default": "",
+            "description": "URL to a custom .zshrc file."
+        },
+        "p10kUrl": {
+            "type": "string",
+            "default": "",
+            "description": "URL to a custom .p10k.zsh file."
+        },
+        "postInstallScriptUrl": {
+            "type": "string",
+            "default": "",
+            "description": "Optional URL to a bash script to execute at the end of the setup."
         }
     },
     "entrypoint": "install.sh",
