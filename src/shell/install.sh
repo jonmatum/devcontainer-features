@@ -1,16 +1,16 @@
 #!/bin/bash
 set -e
 
-# Load feature-utils if available
-if [ -f "/usr/local/share/feature-utils.sh" ]; then
-  . /usr/local/share/feature-utils.sh
-else
-  echo "Warning: feature-utils.sh not found. Continuing without it."
-fi
-
 echo "> Starting shell environment setup..."
 
-USERNAME="${_REMOTE_USER:-vscode}"
+USERNAME="${_REMOTE_USER:-root}"
+
+if id "$USERNAME" &>/dev/null; then
+  echo "Using user: $USERNAME"
+else
+  echo "Warning: User '$USERNAME' not found. Falling back to root."
+  USERNAME="root"
+fi
 
 # Resolve home directory safely
 if [ "${USERNAME}" = "root" ]; then
@@ -34,6 +34,9 @@ ZSH_CUSTOM="${OMZ_DIR}/custom"
 : "${syntaxHighlighting:=true}"
 : "${opinionated:=false}"
 : "${autosuggestHighlight:=fg=8}"
+: "${zshrcUrl:=}"
+: "${p10kUrl:=}"
+: "${postInstallScriptUrl:=}"
 
 detect_package_manager() {
   if command -v apt-get &>/dev/null; then
@@ -165,23 +168,36 @@ fix_permissions() {
 }
 
 apply_opinionated_files() {
-  echo "Applying opinionated config files..."
+  echo "> Applying opinionated config files..."
 
-  local assets_dir
-  assets_dir="$(dirname "$0")/assets"
-
-  if [ -d "$assets_dir" ]; then
-    for file in "$assets_dir"/*; do
-      base_name="$(basename "$file")"
-      target_name="${base_name}"
-      # If the file doesn't start with '.', add one (make it hidden)
-      [[ "${base_name}" != .* ]] && target_name=".${base_name}"
-      echo "Copying ${file} to ${USER_HOME}/${target_name}"
-      cp "$file" "${USER_HOME}/${target_name}"
-      chown "${USERNAME}:${USERNAME}" "${USER_HOME}/${target_name}"
-    done
+  # Download custom .zshrc if provided
+  if [ -n "$zshrcUrl" ]; then
+    echo "Downloading custom .zshrc from $zshrcUrl"
+    curl -fsSL "$zshrcUrl" -o "${USER_HOME}/.zshrc"
+    chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.zshrc"
   else
-    echo "Warning: Assets directory not found: $assets_dir"
+    echo "No custom .zshrc URL provided. Skipping."
+  fi
+
+  # Download custom .p10k.zsh if provided
+  if [ -n "$p10kUrl" ]; then
+    echo "Downloading custom .p10k.zsh from $p10kUrl"
+    curl -fsSL "$p10kUrl" -o "${USER_HOME}/.p10k.zsh"
+    chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.p10k.zsh"
+  else
+    echo "No custom .p10k.zsh URL provided. Skipping."
+  fi
+
+  # Always disable the Powerlevel10k wizard
+  echo "POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true" >>"${USER_HOME}/.zshrc"
+}
+
+run_post_install_script() {
+  if [ -n "$postInstallScriptUrl" ]; then
+    echo "> Running custom post-install script from $postInstallScriptUrl"
+    curl -fsSL "$postInstallScriptUrl" | bash || echo "Warning: Failed to execute post-install script."
+  else
+    echo "> No post-install script URL provided. Skipping."
   fi
 }
 
@@ -214,5 +230,7 @@ fix_permissions
 if [[ "${opinionated}" == "true" ]]; then
   apply_opinionated_files
 fi
+
+run_post_install_script
 
 echo "Shell environment setup completed successfully for ${USERNAME}!"
