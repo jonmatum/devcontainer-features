@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/jonmatum/devcontainer-features/compare/v1.1.0...v1.1.1) (2025-04-28)
+
+
+### Bug Fixes
+
+* **shell:** ensure opinionated config files are applied before fixing permissions ([90b2b01](https://github.com/jonmatum/devcontainer-features/commit/90b2b01bfdda6fff43d2bea3925d596ff965e988))
+
 ## [1.1.0](https://github.com/jonmatum/devcontainer-features/compare/v1.0.1...v1.1.0) (2025-04-28)
 
 
