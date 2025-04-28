@@ -177,6 +177,8 @@ apply_opinionated_files() {
     chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.zshrc"
   else
     echo "No custom .zshrc URL provided. Skipping."
+    # Always disable the Powerlevel10k wizard
+    echo "POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true" >>"${USER_HOME}/.zshrc"
   fi
 
   # Download custom .p10k.zsh if provided
@@ -187,9 +189,6 @@ apply_opinionated_files() {
   else
     echo "No custom .p10k.zsh URL provided. Skipping."
   fi
-
-  # Always disable the Powerlevel10k wizard
-  echo "POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true" >>"${USER_HOME}/.zshrc"
 }
 
 run_post_install_script() {
@@ -225,11 +224,11 @@ if [[ "${syntaxHighlighting}" == "true" && "${ohMyZsh}" == "true" ]]; then
   install_syntax_highlighting
 fi
 
-fix_permissions
-
 if [[ "${opinionated}" == "true" ]]; then
   apply_opinionated_files
 fi
+
+fix_permissions
 
 run_post_install_script
 
