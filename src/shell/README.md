@@ -1,5 +1,5 @@
 
-# Shell Environment (shell)
+# Shell Setup (shell)
 
 Configurable shell setup with optional Zsh, Oh My Zsh, Powerlevel10k, autosuggestions, and syntax highlighting.
 
@@ -7,7 +7,7 @@ Configurable shell setup with optional Zsh, Oh My Zsh, Powerlevel10k, autosugges
 
 ```json
 "features": {
-    "ghcr.io/jonmatum/devcontainer-features/shell:0": {}
+    "ghcr.io/jonmatum/devcontainer-features/shell:1": {}
 }
 ```
 
@@ -20,7 +20,10 @@ Configurable shell setup with optional Zsh, Oh My Zsh, Powerlevel10k, autosugges
 | powerlevel10k | Install the Powerlevel10k theme for Zsh. | boolean | true |
 | autosuggestions | Enable the zsh-autosuggestions plugin. | boolean | true |
 | syntaxHighlighting | Enable the zsh-syntax-highlighting plugin. | boolean | true |
-| opinionated | Apply an opinionated Powerlevel10k configuration for a highly customized prompt. | boolean | false |
+| opinionated | Apply custom opinionated configuration. | boolean | false |
+| zshrcUrl | URL to a custom .zshrc file. | string | - |
+| p10kUrl | URL to a custom .p10k.zsh file. | string | - |
+| postInstallScriptUrl | Optional URL to a bash script to execute at the end of the setup. | string | - |
 
 
 
