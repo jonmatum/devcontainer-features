@@ -92,7 +92,7 @@ Features are automatically published to **GitHub Container Registry (GHCR)** fol
 > **Important:** After publishing, Features must be manually marked as **Public** in the GitHub Package settings to be discoverable and usable.
 
 **Example URLs:**
-- Feature: `https://github.com/users/jonmatum/packages/container/devcontainer-features%2Fshell`
+- Feature: `https://github.com/users/jonmatum/packages/container/devcontainer-features/shell`
 - Collection: `https://github.com/users/jonmatum/packages/container/devcontainer-features`
 
 ## License
@@ -101,4 +101,4 @@ Licensed under the [MIT License](LICENSE).
 
 ---
 
-> _Pura Vida & Happy Coding!_ 
+> echo "Pura Vida & Happy Coding!"; 
