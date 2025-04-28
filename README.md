@@ -24,13 +24,13 @@ You can reference features from this repository directly using the `gh:` prefix 
 ```json
 {
     "features": {
-        "gh:jonmatum/devcontainer-features/features/python:1.0.0": {
+        "gh:jonmatum/devcontainer-features/python:1.0.0": {
             "version": "3.11.9",
             "pipenv": true
         },
-        "gh:jonmatum/devcontainer-features/features/aws:1.0.0": {},
-        "gh:jonmatum/devcontainer-features/features/terraform:1.0.0": {},
-        "gh:jonmatum/devcontainer-features/features/shell:1.0.0": {}
+        "gh:jonmatum/devcontainer-features/aws:1.0.0": {},
+        "gh:jonmatum/devcontainer-features/terraform:1.0.0": {},
+        "gh:jonmatum/devcontainer-features/shell:1.0.0": {}
     }
 }
 ```
