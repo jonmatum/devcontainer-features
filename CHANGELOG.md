@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/jonmatum/devcontainer-features/compare/v1.1.1...v1.1.2) (2025-04-28)
+
+
+### Bug Fixes
+
+* **shell:** ensure always disable the Powerlevel10k wizard ([1ec6969](https://github.com/jonmatum/devcontainer-features/commit/1ec69697a9e0ad3b4c255cc5ea81175a8bbd4d27))
+
 ## [1.1.1](https://github.com/jonmatum/devcontainer-features/compare/v1.1.0...v1.1.1) (2025-04-28)
 
 
