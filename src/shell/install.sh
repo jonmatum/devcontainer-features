@@ -27,8 +27,10 @@ OMZ_DIR="${USER_HOME}/.oh-my-zsh"
 ZSH_CUSTOM="${OMZ_DIR}/custom"
 
 # Feature options
+: "${TIMEZONE:=UTC}"
 : "${INSTALLZSH:=true}"
 : "${OHMYZSH:=true}"
+: "${NERDFONT:=true}"
 : "${POWERLEVEL10K:=true}"
 : "${AUTOSUGGESTIONS:=true}"
 : "${SYNTAXHIGHLIGHTING:=true}"
@@ -143,6 +145,28 @@ install_powerlevel10k() {
   fi
 }
 
+install_nerd_font() {
+  local font_name="Meslo"
+  local font_version="v3.0.2"
+  local download_url="https://github.com/ryanoasis/nerd-fonts/releases/download/${font_version}/${font_name}.zip"
+  local install_dir="${USER_HOME}/.local/share/fonts"
+
+  echo "Installing ${font_name} Nerd Font v3..."
+
+  install_package_if_missing curl
+  install_package_if_missing unzip
+  install_package_if_missing fc-cache || install_package_if_missing fontconfig
+
+  mkdir -p "$install_dir"
+  curl -fLo "/tmp/${font_name}.zip" --retry 3 --retry-delay 2 --location "$download_url"
+  unzip -o "/tmp/${font_name}.zip" -d "$install_dir"
+  fc-cache -f "$install_dir"
+
+  chown -R "${USERNAME}:${USERNAME}" "$install_dir"
+
+  echo "${font_name} installed to $install_dir"
+}
+
 install_autosuggestions() {
   local plugin_dir="${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
   if [ ! -d "${plugin_dir}" ]; then
@@ -168,28 +192,33 @@ fix_permissions() {
 }
 
 apply_opinionated_files() {
-  echo "> Applying opinionated config files..."
+  echo "Applying .zshrc and .p10k.zsh configuration..."
 
-  # Download custom .zshrc if provided
-  if [ -n "$ZSHRCURL" ]; then
-    echo "Downloading custom .zshrc from $ZSHRCURL"
-    curl -fsSL "$ZSHRCURL" -o "${USER_HOME}/.zshrc"
+  local default_zshrc_url="https://gist.githubusercontent.com/jonmatum/55a5ff475dbb3c5854d5ddd40dc5961d/raw/ccdd446307f915627691e58a935af8246cfd4aeb/.zshrc"
+  local default_p10k_url="https://gist.githubusercontent.com/jonmatum/c0b7c317f281b03bb857e425fe23f9d4/raw/031c6099a176989cc0ecbc24f097c7d547195e08/.p10k.zsh"
+
+  local final_zshrc_url="${ZSHRCURL:-$default_zshrc_url}"
+  local final_p10k_url="${P10KURL:-$default_p10k_url}"
+
+  if curl -fsSL "$final_zshrc_url" -o "${USER_HOME}/.zshrc"; then
+    echo ".zshrc downloaded from $final_zshrc_url"
     chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.zshrc"
   else
-    echo "No custom .zshrc URL provided. Skipping."
+    echo "Failed to download .zshrc from $final_zshrc_url"
   fi
 
-  # Download custom .p10k.zsh if provided
-  if [ -n "$P10KURL" ]; then
-    echo "Downloading custom .p10k.zsh from $P10KURL"
-    curl -fsSL "$P10KURL" -o "${USER_HOME}/.p10k.zsh"
+  if curl -fsSL "$final_p10k_url" -o "${USER_HOME}/.p10k.zsh"; then
+    echo ".p10k.zsh downloaded from $final_p10k_url"
     chown "${USERNAME}:${USERNAME}" "${USER_HOME}/.p10k.zsh"
   else
-    echo "No custom .p10k.zsh URL provided. Skipping."
+    echo "Failed to download .p10k.zsh from $final_p10k_url"
   fi
 
-  # Always disable the Powerlevel10k wizard
-  echo "POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true" >>"${USER_HOME}/.zshrc"
+  # Disable Powerlevel10k wizard only if not already set
+  if ! grep -q 'POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true' "${USER_HOME}/.zshrc"; then
+    echo "Disabling Powerlevel10k config wizard"
+    echo "POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true" >>"${USER_HOME}/.zshrc"
+  fi
 }
 
 run_post_install_script() {
@@ -201,9 +230,59 @@ run_post_install_script() {
   fi
 }
 
+print_summary() {
+  echo
+  echo -e "${BOLD}> Setup Summary:${NC}"
+  echo
+
+  summary_check() {
+    local label="$1"
+    local cmd="$2"
+    local version_cmd="$3"
+    printf "  %-22s" "$label"
+    if command -v "$cmd" >/dev/null 2>&1; then
+      echo -en "${GREEN}✔ Installed${NC}  "
+      { eval "$version_cmd" 2>/dev/null || echo "Version unknown"; } | head -n 1 || true
+    else
+      echo -e "${RED}✘ Not found${NC}"
+    fi
+  }
+
+  [[ "$INSTALLZSH" == "true" ]] && summary_check "Zsh" zsh "zsh --version"
+  [[ "$OHMYZSH" == "true" ]] && summary_check "Oh My Zsh" zsh "grep -q oh-my-zsh ~/.zshrc && echo 'Enabled'"
+  [[ "$POWERLEVEL10K" == "true" ]] && summary_check "Powerlevel10k" zsh "grep -q powerlevel10k ~/.zshrc && echo 'Enabled'"
+  [[ "$NERDFONT" == "true" ]] && summary_check "Nerd Font" fc-cache "fc-list | grep -i meslo | head -n 1"
+  [[ "$AUTOSUGGESTIONS" == "true" ]] && summary_check "Autosuggestions" zsh "grep -q zsh-autosuggestions ~/.zshrc && echo 'Enabled'"
+  [[ "$SYNTAXHIGHLIGHTING" == "true" ]] && summary_check "Syntax Highlighting" zsh "grep -q zsh-syntax-highlighting ~/.zshrc && echo 'Enabled'"
+  [[ "$OPINIONATED" == "true" ]] && summary_check "Opinionated Config" curl "echo 'Custom .zshrc and .p10k.zsh used'"
+
+  echo
+  echo -e "${BOLD}✔ Shell environment setup complete for ${USERNAME}!${NC}"
+}
+
+configure_timezone() {
+  if [ -n "$TIMEZONE" ]; then
+    echo "Setting timezone to $TIMEZONE"
+
+    ln -sf "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime || {
+      echo "Failed to link timezone. Check if $TIMEZONE is valid."
+      return
+    }
+    echo "$TIMEZONE" >/etc/timezone 2>/dev/null || true
+
+    # Debian-specific handling for tzdata reconfiguration
+    if command -v dpkg-reconfigure &>/dev/null; then
+      install_package_if_missing tzdata
+      DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata
+    fi
+  fi
+}
+
 # --- MAIN ---
 
 ensure_common_dependencies
+
+configure_timezone
 
 if [[ "${INSTALLZSH}" == "true" ]]; then
   install_zsh
@@ -215,6 +294,10 @@ fi
 
 if [[ "${POWERLEVEL10K}" == "true" && "${OHMYZSH}" == "true" ]]; then
   install_powerlevel10k
+fi
+
+if [[ "${NERDFONT}" == "true" ]]; then
+  install_nerd_font
 fi
 
 if [[ "${AUTOSUGGESTIONS}" == "true" && "${OHMYZSH}" == "true" ]]; then
@@ -233,4 +316,4 @@ fix_permissions
 
 run_post_install_script
 
-echo "Shell environment setup completed successfully for ${USERNAME}!"
+print_summary

@@ -1,0 +1,14 @@
+{
+  "name": "Feature Test Sandbox",
+  "image": "{{ image }}",
+  "features": {
+    {% for feature in features %}
+    "./features/{{ feature }}": {
+      {% if feature == "shell" %}
+      "timezone": "America/Costa_Rica",
+      "opinionated": true
+      {% endif %}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  }
+}

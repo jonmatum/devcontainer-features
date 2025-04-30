@@ -1,0 +1,10 @@
+_subdirectory: devcontainer_template
+_questions:
+  features:
+    type: yaml
+    help: "List of features to include"
+    default: ["shell"]
+  image:
+    type: str
+    help: "Base image to use"
+    default: "ubuntu:latest"

@@ -1,71 +1,122 @@
+# Configuration
 SANDBOX_DIR = .sandbox
+SANDBOX_ANSWERS_FILE = $(SANDBOX_DIR)/answers.yml
+COPIER_VENV = .venv-tools
+COPIER_BIN = $(COPIER_VENV)/bin/copier
 FEATURES ?= shell
 IMAGE ?= ubuntu:latest
 IMAGES = ubuntu:latest debian:latest amazonlinux:2023 mcr.microsoft.com/devcontainers/base:ubuntu
+ANSWERS_FILE = .copier-answers.yml
 
-.PHONY: help sandbox clean build up rebuild exec stop logs interactive
+.PHONY: help sandbox clean build up rebuild exec stop logs interactive ensure-copier format validate
 
+# Help Documentation
 help:
 	@echo ""
-	@echo "\033[1;36mAvailable make commands:\033[0m"
-	@echo "--------------------------------------"
-	@echo "\033[1;36mSandbox Management:\033[0m"
-	@printf "  %-28s - %s\n" "make sandbox" "Create sandbox for features"
-	@printf "  %-28s - %s\n" "make clean" "Remove sandbox"
+	@echo "Available make commands"
+	@echo "------------------------"
+	@echo "Sandbox Management:"
+	@printf "  %-28s %s\n" "make sandbox" "Create sandbox using Copier and answers file"
+	@printf "  %-28s %s\n" "make interactive" "Prompt user to create .copier-answers.yml"
+	@printf "  %-28s %s\n" "make clean" "Remove the generated sandbox directory"
 	@echo ""
-	@echo "\033[1;36mDevcontainer Lifecycle:\033[0m"
-	@printf "  %-28s - %s\n" "make devcontainer-up" "Build/start devcontainer"
-	@printf "  %-28s - %s\n" "make build" "Build the container only (no attach)"
-	@printf "  %-28s - %s\n" "make up" "Start/attach to running container"
-	@printf "  %-28s - %s\n" "make rebuild" "Clean + re-sandbox + up"
-	@printf "  %-28s - %s\n" "make stop" "Stop the devcontainer"
-	@printf "  %-28s - %s\n" "make logs" "Show container logs"
+	@echo "Devcontainer Lifecycle:"
+	@printf "  %-28s %s\n" "make devcontainer-up" "Create and run devcontainer"
+	@printf "  %-28s %s\n" "make build" "Build devcontainer image only"
+	@printf "  %-28s %s\n" "make up" "Alias to 'devcontainer-up'"
+	@printf "  %-28s %s\n" "make exec CMD='zsh'" "Execute command in container"
 	@echo ""
-	@echo "\033[1;36mDevcontainer Utilities:\033[0m"
-	@printf "  %-28s - %s\n" "make exec CMD=\"zsh\"" "Execute a command in the devcontainer"
-	@printf "  %-28s - %s\n" "make interactive" "Interactive feature/image selection"
+	@echo "Utility and Maintenance:"
+	@printf "  %-28s %s\n" "make format" "Format devcontainer.json using jq"
+	@printf "  %-28s %s\n" "make container-id" "Print running devcontainer ID"
 	@echo ""
-	@echo "\033[1;36mUsage Examples:\033[0m"
-	@echo "--------------------------------------"
-	@echo "  make sandbox FEATURES=\"shell hello\" IMAGE=<image>"
-	@echo "  make devcontainer-up FEATURES=\"shell hello\" IMAGE=<image>"
+	@echo "Reference:"
+	@echo "  - Features live under ./src/<feature>"
+	@echo "  - Base images: $(IMAGES)"
 	@echo ""
+	@echo "Examples:"
+	@echo "  make sandbox FEATURES=\"shell hello\" IMAGE=debian:latest"
+	@echo "  make devcontainer-up"
 
+# List available feature folders
 list-features:
 	@echo "Available features:"
 	@cd src && find . -maxdepth 1 -mindepth 1 -type d | sed 's|^\./||' | sort | nl
 
+# List supported base images
 list-images:
 	@echo "Available base images:"
 	@echo "$(IMAGES)" | tr ' ' '\n' | sort | nl
 
-sandbox:
-	@echo "Creating sandbox environment for features: $(FEATURES) with base image: $(IMAGE)"
-	rm -rf $(SANDBOX_DIR)
-	mkdir -p $(SANDBOX_DIR)/.devcontainer/features
-	@for feature in $(FEATURES); do \
-		cp -r src/$$feature $(SANDBOX_DIR)/.devcontainer/features/$$feature; \
-	done
-	@echo '{' > $(SANDBOX_DIR)/.devcontainer/devcontainer.json
-	@echo '  "name": "Feature Test Sandbox",' >> $(SANDBOX_DIR)/.devcontainer/devcontainer.json
-	@echo '  "image": "$(IMAGE)",' >> $(SANDBOX_DIR)/.devcontainer/devcontainer.json
-	@echo '  "features": {' >> $(SANDBOX_DIR)/.devcontainer/devcontainer.json
-	@features_array=$(FEATURES); \
-	for feature in $$features_array; do \
-		echo "    \"./features/$$feature\": {}," >> $(SANDBOX_DIR)/.devcontainer/devcontainer.json; \
-	done
-	sed -i '' '$$s/,$$//' $(SANDBOX_DIR)/.devcontainer/devcontainer.json
-	@echo '  }' >> $(SANDBOX_DIR)/.devcontainer/devcontainer.json
-	@echo '}' >> $(SANDBOX_DIR)/.devcontainer/devcontainer.json
-	@echo "Sandbox created at $(SANDBOX_DIR)/"
+# Ensure Copier is installed in a local virtualenv
+ensure-copier:
+	@echo "Checking for Copier..."
+	@if [ ! -x "$(COPIER_BIN)" ]; then \
+		echo "Copier not found. Creating virtualenv..."; \
+		if ! command -v python3 >/dev/null 2>&1; then \
+			echo "python3 is required but not found. Please install it."; \
+			exit 1; \
+		fi; \
+		python3 -m venv $(COPIER_VENV); \
+		. $(COPIER_VENV)/bin/activate && pip install --upgrade pip copier; \
+		echo "Copier installed in $(COPIER_VENV)"; \
+	else \
+		echo "Copier already available."; \
+	fi
 
+# Generate the sandbox with Copier
+sandbox: ensure-copier
+	@if [ ! -f $(ANSWERS_FILE) ]; then \
+		echo "No $(ANSWERS_FILE) found. Running interactive setup..."; \
+		$(MAKE) interactive; \
+	else \
+		read -p "Use existing $(ANSWERS_FILE)? [Y/n]: " CONFIRM; \
+		if [ "$$CONFIRM" = "n" ] || [ "$$CONFIRM" = "N" ]; then \
+			$(MAKE) interactive; \
+		fi; \
+	fi
+	@echo "Using $(ANSWERS_FILE) to generate sandbox..."
+	rm -rf $(SANDBOX_DIR)
+	mkdir -p $(SANDBOX_DIR)
+	@echo "Copying feature definitions into sandbox..."
+	mkdir -p $(SANDBOX_DIR)/.devcontainer/features
+	cp -R src/* $(SANDBOX_DIR)/.devcontainer/features/
+	cp $(ANSWERS_FILE) $(SANDBOX_ANSWERS_FILE)
+	$(COPIER_BIN) copy -a $(notdir $(SANDBOX_ANSWERS_FILE)) .template $(SANDBOX_DIR)
+	@$(MAKE) format
+	@jq . $(SANDBOX_DIR)/.devcontainer/devcontainer.json
+
+
+# Prompt user to select features and base image, then generate answers file
+interactive: ensure-copier
+	@$(MAKE) list-features
+	@read -p "Select feature numbers (space-separated): " NUMS; \
+	FEATURES_SELECTED=""; \
+	for n in $$NUMS; do \
+		F=$$(cd src && find . -maxdepth 1 -mindepth 1 -type d | sed 's|^\./||' | sort | sed -n "$${n}p"); \
+		FEATURES_SELECTED="$$FEATURES_SELECTED $$F"; \
+	done; \
+	echo ""; \
+	$(MAKE) list-images; \
+	read -p "Select image number: " IMG_NUM; \
+	IMAGE_SELECTED=$$(echo "$(IMAGES)" | tr ' ' '\n' | sort | sed -n "$${IMG_NUM}p"); \
+	echo ""; \
+	echo "You selected: $$FEATURES_SELECTED for image $$IMAGE_SELECTED"; \
+	echo "features:" > $(ANSWERS_FILE); \
+	for f in $$FEATURES_SELECTED; do echo "  - $$f"; done >> $(ANSWERS_FILE); \
+	echo "image: $$IMAGE_SELECTED" >> $(ANSWERS_FILE); \
+	echo "$(ANSWERS_FILE) generated."
+
+# Clean the sandbox directory
 clean:
 	@echo "Cleaning sandbox..."
 	rm -rf $(SANDBOX_DIR)
 	@echo "Sandbox cleaned."
 
+# Devcontainer lifecycle commands
+	
 devcontainer-up: sandbox
-	@echo "Launching devcontainer for features $(FEATURES) using image $(IMAGE)..."
+	@echo "Launching devcontainer..."
 	cd $(SANDBOX_DIR) && devcontainer up --workspace-folder .
 
 build:
@@ -74,30 +125,15 @@ build:
 up:
 	cd $(SANDBOX_DIR) && devcontainer up --workspace-folder .
 
-rebuild: clean devcontainer-up
-
 exec:
 	cd $(SANDBOX_DIR) && devcontainer exec --workspace-folder . -- $(CMD)
 
-stop:
-	cd $(SANDBOX_DIR) && devcontainer stop --workspace-folder .
+# Format devcontainer.json using jq
+format:
+	@echo "Formatting devcontainer.json..."
+	@jq . $(SANDBOX_DIR)/.devcontainer/devcontainer.json > $(SANDBOX_DIR)/.devcontainer/devcontainer.json.tmp && \
+	mv $(SANDBOX_DIR)/.devcontainer/devcontainer.json.tmp $(SANDBOX_DIR)/.devcontainer/devcontainer.json && \
+	echo "Formatted successfully."
 
-logs:
-	cd $(SANDBOX_DIR) && devcontainer logs --workspace-folder .
-
-interactive:
-	@$(MAKE) list-features
-	@read -p "Select feature numbers (space-separated): " FEATURES_NUMBERS; \
-	FEATURES_SELECTED=""; \
-	for num in $$FEATURES_NUMBERS; do \
-		FEATURE=$$(cd src && find . -maxdepth 1 -mindepth 1 -type d | sed 's|^\./||' | sort | sed -n "$${num}p"); \
-		FEATURES_SELECTED="$$FEATURES_SELECTED $$FEATURE"; \
-	done; \
-	echo ""; \
-	$(MAKE) list-images; \
-	read -p "Select image number: " IMAGE_NUMBER; \
-	IMAGE_SELECTED=$$(echo "$(IMAGES)" | tr ' ' '\n' | sort | sed -n "$${IMAGE_NUMBER}p"); \
-	echo ""; \
-	echo "Using features: $$FEATURES_SELECTED"; \
-	echo "Using image: $$IMAGE_SELECTED"; \
-	$(MAKE) devcontainer-up FEATURES="$$FEATURES_SELECTED" IMAGE="$$IMAGE_SELECTED"
+container-id:
+	@docker ps --filter "name=devcontainer" --format "{{.ID}}"
