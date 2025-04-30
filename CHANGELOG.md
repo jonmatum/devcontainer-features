@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/jonmatum/devcontainer-features/compare/v1.1.3...v1.2.0) (2025-04-30)
+
+
+### Features
+
+* unified shell + sandbox setup with Copier, devcontainer CLI, and robust features ([#43](https://github.com/jonmatum/devcontainer-features/issues/43)) ([4efb20c](https://github.com/jonmatum/devcontainer-features/commit/4efb20ccf7244eedcbde25f576e1ad150292a2e7))
+
 ## [1.1.3](https://github.com/jonmatum/devcontainer-features/compare/v1.1.2...v1.1.3) (2025-04-28)
 
 
