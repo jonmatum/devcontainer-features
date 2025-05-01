@@ -28,3 +28,5 @@ Thumbs.db
 
 .sandbox/
 .venv-tools/
+
+.copier-answers.yml
